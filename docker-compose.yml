@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    image: nestjs-docker:local
+    container_name: nestjs-docker
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app
