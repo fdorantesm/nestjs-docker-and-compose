@@ -1,20 +1,20 @@
 # Dockerizando aplicación en NestJS
 
-Estandarizar el lanzamiento de una aplicación en ambientes de desarrollo y producción nos ayudará a despreocuparnos de instalar dependencias cada vez que queremos hacer un despliegue en un servidor, ya sea una instancia en la nube o un ambiente local.
+Estandarizar la ejecución de una aplicación nos ayudará a despreocuparnos de instalar dependencias y realizar configuraciones cada vez que queremos hacer un despliegue en un servidor, ya sea un ambiente local o en la nube.
 
-Con Javascript no es muy común tener que hacer configuraciones extras en un servidor, sin embargo, en lenguajes como PHP es más común instalar librerías del SO, habilitar o deshabilitar configuraciones, etc.
+Con Javascript no es muy común tener que hacer configuraciones en el servidor, sin embargo, en lenguajes como PHP es más común instalar librerías en el SO, habilitar o deshabilitar configuraciones, etc.
 
-Considero yo que la principal ventaja que tenemos al dockerizar nuestras aplicaciones es que estas correrán de la misma manera en desarrollo y en producción, en escenarios normales.
-
-Para poder construir una imagen que pueda ser ejecutada en un servidor es necesario conocer por lo menos las bases de Docker y comprender cómo funciona.
+Para poder construir una imagen es necesario conocer por lo menos las bases de Docker y comprender cómo funciona.
 
 Lo primero que debemos saber es que docker se compone por contenedores e imagenes.
 
-Un contenedor es una “instancia” en ejecución de una imagen, y una imagen es una versión de un sistema operativo con los elementos y configuraciones necesarias para ejecutar un proyecto.
+Un contenedor es un empaquetado con lo mínimo necesario para ejecutar una aplicación y una imagen es captura del estado inicial con la que se genera dicho contenedor.
 
-Por ejemplo, cuando nosotros ejecutamos un contenedor basado en una imagen de node, estamos ejecutando un sistema operativo linux con node previamente instalado.
+Por ejemplo, cuando nosotros ejecutamos un contenedor basado en una imagen de node, estamos ejecutando un sistema operativo linux con lo mínimo necesario y node previamente instalado.
 
-Cuando nosotros modificamos dicha imagen de node agregando nuestras configuraciones estamos hablando de que se está construyendo nuestra propia imagen. Esta imagen la podemos ejecutar las veces que sean necesarias además de que podemos subirlas a un repositorio de imagenes para poder desplegarla en un servidor sin la necesidad de clonar el proyecto.
+Cuando nosotros nos basamos en dicha imagen de node agregando nuestras configuraciones estamos hablando de que estamos construyendo nuestra propia imagen. Esta imagen la podemos ejecutar las veces que sean necesarias además de que podemos subirlas a un repositorio para poder desplegarla en un servidor y así desplegar en producción sin necesidad de clonar el proyecto con git, compilar, etc.
+
+Para construir una imagen necesitamos escribir una receta con las instrucciones que se van a ejecutar en un archivo llamado Dockerfile.
 
 ---
 
@@ -118,5 +118,45 @@ Para levantar nuestra aplicación en modo de desarrollo solo tendremos que ejecu
 ```bash
 docker-compose up
 ```
+
+Mientras que para levantar nuestra aplicación en modo producción tendremos que compilar la imagen y posteriormente correr un contenedor con esa imagen:
+
+Compilamos la imagen `nestjs-docker` con el tag `latest` para indicar que es la última versión, o una en específico `:1.0.0`
+
+```bash
+docker build . -t nestjs-docker:latest
+```
+
+Levantamos el contenedor en segundo plano con `-d` y mapeamos los puertos 3000 de nuestro equipo al 3000 del contenedor.
+
+```bash
+docker run -d -p 3000:3000 --name nestjs-docker-container nestjs-docker # docker run [options] <image>
+```
+
+Para ver los contenedores que tenemos en ejecución usaremos `ps`
+
+```bash
+docker ps
+```
+
+![DockerPs](images/docker-ps.png 'docker ps')
+
+Para ver las imagenes que tenemos usaremos `image ls`
+
+```bash
+docker image ls
+```
+
+![DockerImageLs](images/docker-image-ls.png 'docker image ls')
+
+Para ver los logs:
+
+```bash
+docker logs -f nestjs-docker-container
+```
+
+![DockerLogs](images/docker-logs.png 'docker logs')
+
+![Browser](images/browser.png 'browser')
 
 Como pudimos ver comenzar con Docker no es muy complicado si estás acostumbrado a la terminal de unix pero tampoco estás en desventaja significativa si no la conoces. Para levantar una aplicación como esta utilizarás comandos que ya usas fuera de Docker.
